@@ -1,0 +1,97 @@
+---
+title: "DATA 605 Assignment1"
+author: "Raghu"
+date: "August 26, 2017"
+output: html_document
+---
+
+
+
+## PROBLEM SET 1
+
+
+### (1) Calculate the dot product u.v where u = [0.5;0.5] and v = [3;−4] 
+
+```{r q1.1, include=TRUE}
+
+u <- c(0.5,0.5)
+v <- c(3,-4)
+
+dot_prod <- u %*% v
+
+dot_prod
+
+```
+
+### (2) What are the lengths of u and v? Please note that the mathematical notion of the length of a vector is not the same as a computer science deﬁnition.
+
+```{r q1.2, include=TRUE}
+
+len_u <- sqrt(sum(u*u))
+len_v <- sqrt(sum(v*v))
+len_u
+len_v
+```
+
+### (3) What is the linear combination: 3u−2v? 
+
+```{r q1.3, include=TRUE}
+
+lin_cmb <- (3*u) - (2*v)
+lin_cmb
+
+```
+
+### (4) What is the angle between u and v
+
+```{r q1.4, include=TRUE}
+
+angle <- acos(dot_prod/(len_u * len_v))
+angle
+
+
+```
+
+
+## PROBLEM SET 2
+
+### Please write a function in R that will take two variables (matrix A & constraint vector b) and solve using elimination
+
+```{r q2, include=TRUE}
+
+# Function to solve 3X3 matrix system equation
+mysolve <- function(a,b){
+  
+  # add on the constraint vector as column to matrix
+  se <- cbind(a, b)
+  
+  # gauss transform: for row 2
+  se[2,] <- -1 * se[2,1]/se[1,1] * se[1,] + se[2,]
+  
+  # gauss transform: for row 3, col 1
+  se[3,] <- -1 * se[3,1]/se[1,1] * se[1,] + se[3,]
+  
+  # gauss transform: for row 3, col 2
+  se[3,] <- -1 * se[3,2]/se[2,2] * se[2,] + se[3,]
+  
+  # substitution 
+  z <- se[3,4] / se[3,3]
+  
+  y <- (se[2,4] - se[2,3] * z) / se[2,2]
+  
+  x <- (se[1,4] - se[1,3] * z - se[1,2] * y) / se[1,1]
+  
+  
+  result <- as.vector(round(c(x,y,z), digits=2))
+  
+  return(result)
+}
+
+
+A <- t(matrix(c(1,1,3,2,-1,5,-1,-2,4), ncol=3))
+
+cons <- c(1,2,6)
+
+mysolve(A,cons)
+
+```
