@@ -1,0 +1,113 @@
+---
+title: "Data 605 Assignment4"
+author: "Raghu"
+date: "September 21, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. Problem set 1
+In this problem, we'll verify using R that SVD and Eigenvalues are related as worked out in the weekly module. Given a 3 x 2 matrix **A**
+
+$$ A = \begin{bmatrix} 1 & 2 & 3 \\ -1 & 0 & 4 \end{bmatrix} $$ 
+
+
+```{r P1.1, include=TRUE}
+(A <- matrix(c(1,-1,2,0,3,4),nrow=2))
+# Display Matrix A
+A
+```
+
+
+write code in R to compute **X** = $AA^T$ and $Y = A^TA$. 
+
+```{r P1.2, include=TRUE}
+X <- A %*% t(A)
+X
+Y <- t(A) %*% A
+Y
+```
+
+Then, compute the eigenvalues and eigenvectors of **X** and **Y** using the built-in commans in R. 
+
+```{r P1.3, include=TRUE}
+eigen(X)$values
+eigen(X)$vectors
+eigen(Y)$values
+eigen(Y)$vectors
+
+```
+
+
+Then, compute the left-singular, singular values, and right-singular vectors of **A** using the svd command. 
+
+```{r P1.4, include=TRUE}
+
+svd_a <- svd(A)
+#left-singular vectors
+svd_a$u
+#singular values
+svd_a$d
+#right-singular vectors
+svd_a$v
+
+```
+
+**Examine the two sets of singular vectors and show that they are indeed eigenvectors of ** **X and  Y **. 
+
+Examining the results above, left-singular vectors (u) contains eigenvectors of X and right-singular vectors (v) contains eigen vectors of Y, although the first two columns of eignvectors of X and Y has the opposite sign of u and v they are equivalent as they simply represent scalar multiplication.
+
+**In addition, the two non-zero eigenvalues (the 3rd value will be very close to zero, if not zero) of both X and Y are the same and are squares of the non-zero singular values of A **.
+
+```{r P1.5, include=TRUE}
+sq <- svd_a$d^2
+sq
+
+```
+
+The above statement is confirmed based on the results above.
+
+
+## 2. Problem set 2
+
+Using the procedure outlined in section 1 of the weekly handout, write a function to
+compute the inverse of a well-conditioned full-rank square matrix using co-factors. In order
+to compute the co-factors, you may use built-in commands to compute the determinant.
+Your function should have the following signature:
+
+B = myinverse(A)
+where A is a matrix and B is its inverse and A x B = I. The off-diagonal elements of I
+should be close to zero, if not zero. Likewise, the diagonal elements should be close to 1, if
+not 1. Small numerical precision errors are acceptable but the function myinverse should
+be correct and must use co-factors and determinant of A to compute the inverse.
+
+
+```{r P2, include=TRUE}
+
+myinverse <- function(x) {
+  # check if matrix is square
+  if(nrow(x) != ncol(x)) { return('Input only squre matrix')}
+  # replace all values with zeros
+  Matr <- matrix(rep(0,length(x)),ncol=ncol(x))
+  #Find determinant and inverse
+  for (i in 1:ncol(x)) {
+    for (j in 1:nrow(x)) {
+      Matr[i,j] <- det(x[-i,-j])*(-1)^(i+j) 
+    }
+  }
+  return(t(Matr)/det(x)) 
+}
+
+A <- matrix(c(1,2,4,2,-1,3,4,0,1),nrow=3)
+#Inverse using 'myinverse' function
+(B <- myinverse(A))
+
+solve(A)
+
+```
