@@ -1,0 +1,191 @@
+---
+title: "Data 605 Assignment7"
+author: "Raghu"
+date: "October 14, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Problem1. 
+Let X1, X2, . . . , Xn be n mutually independent random variables, each of
+which is uniformly distributed on the integers from 1 to k. Let Y denote the
+minimum of the Xi's. Find the distribution of Y .
+
+
+ANS:  
+
+For $$ 1 \leq  j \leq k, m(j) =   (k-j+1)^n - (k - j)^n  /  k^n  $$
+    
+     
+Since $Y$ is the minimum value of $Xi$ over all of the $Xi'$s, then in order to find the distribution function $m(j) = P(Y = j)$, we will need to count the number of ways that we can assign $X1,X2......Xn$ to values between j and k with at least one $Xi$ being assigned to j and divide by the total number of possible ways to assign $X1,X2......Xn$ to values between 1 and k.
+
+  
+First, suppose that each $Xi$ has k possibilities: 1, 2,....k. Then, the total possible number of assignments for the entire collection of random variables $X1,X2......Xn$ is $k^n$. This will form the denominator for probability distribution function.
+
+  
+Now, the number of ways of getting $Y = 1$ is  $$ k^n -(k-1)^n $$
+
+since $$k^n$$ represents the total number of options and $ (k-1)^n $ represents all of the options where none of the $Xi'$s are equal to 1.
+
+  
+If $Y = 2$, then there are $$ k^n -(k-2)^n - [ k^n -(k-1)^n ] $$
+different options for the collection of $ Xi $ 's, where the $$k^n$$ represents the total number of options (with no restrictions), $$(k-2)^n$$ represents the number of ways that we could assign $X1,X2......Xn$ with all of their values being greater than 2, and, as we showed above,  $$[k^n -(k-1)^n]$$  represents the number of ways that we could assign $X1,X2......Xn$ and have at least one of them equal 1 (i.e. Y = 1). We can simplify above equation to get $$ (k - 1)^n - (k - 2)^n $$
+
+
+In general, if Y = j then there are $$ ( k - j + 1)^n -(k-j)^n $$ ways  to assign $X1,X2......Xn$ so that minimumvalue is j.  
+
+
+
+
+###Problem 2. 
+
+Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer's expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.).
+
+
+
+a. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years..)
+
+E(X)=ns=10
+Probability that machine fail once every 10 years
+
+s is the probability that the machine fail 
+
+q is the probability that the machine does not fail
+
+```{r P1.a, include=TRUE}
+s=1/10
+s
+q=1-s
+q
+#ns=10
+n=10/s
+n
+#v(x)=nsq
+n*s*q
+# Probability that machine will fail after 8 years
+#using R function pgeom
+p <- pgeom(8, s, lower.tail = F)
+p
+#probability will copier will fail
+p = 1 -p
+p
+#expected value:mean 
+#s is probabity of copier failure
+m <- round(1/s,2)
+m
+#standard deviation
+sd <- round(sqrt((1-s)/(s^2)),2)
+sd
+
+```
+
+$$ P(X>=9) = P( (X - EX(X))/\sqrt{(V(X)})$$
+
+
+
+b. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as an exponential.
+
+Using Exponential Distribution $p(n) = e^{{-\lambda}x}$, probability that copier will be working or fail after $8$ years is,
+
+Expected value ns =10
+Standard deviation = $\sqrt{(V(X)})$
+
+```{r Pb, include=TRUE}
+#number of trials
+i = 8
+#failure rate of copier
+s = 1/10
+#copier working
+f = 1 - s
+
+#using R function pexp
+p <- pexp(8, s, lower.tail = F)
+p
+#probability will copier will fail
+p = 1 -p
+p
+#expected value: mean 
+#s is probabity of copier failure, lambda
+m <- round(1/s,2)
+m
+#standard deviation
+#in expontential distribution standard deviation = mean
+sd <- m
+sd
+```
+
+
+
+
+c. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years)
+
+
+P(X = X) =  $$ {{8}\choose{x}} (0.10)^x (0.90)^{8-x} $$
+
+
+P(X = 8) =  $$ {{8}\choose{8}} (0.10)^8 (0.90)^{8-8} $$
+
+=0.43
+
+
+```{r P2, include=TRUE}
+
+#number of trials
+i = 8
+#probability of failure rate of copier
+s = 1/10
+#copier working
+d = 1 - s
+#using R function pbinom
+p <- pbinom(0, size=8, prob=0.1)
+p
+#probability will copier will fail
+p = 1 -p
+p
+#expected value:mean 
+#s is probabity of failure
+#i is number of years
+m <- round(i * s,2)
+m
+#standard deviation
+#square root of mean * (1-p)
+sd <- sqrt(m * d)
+sd
+```
+
+d. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a Poisson.
+
+
+```{r P3, include=TRUE}
+#number of trials
+t = 8
+#mean or average failure rate of copier(success) in 8 years
+k = 0
+#probability of failure 
+p = 1/10
+
+#lambda = years * probability of failure
+l = t * p
+#using R function ppois
+pp <- ppois(0, lambda = l)
+pp
+#probability will copier will fail
+pp = 1 -pp
+pp
+#expected value: mean 
+#s is probabity of failure(p)
+#i is number of years(n)
+m <- round(l,2)
+m
+#standard deviation
+#square root of mean
+sd <- sqrt(m)
+sd
+```
+
