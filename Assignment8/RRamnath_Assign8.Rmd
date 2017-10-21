@@ -1,0 +1,177 @@
+---
+title: "Data 605 Assignment8"
+author: "Raghu"
+date: "October 20, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Problem11.
+
+A company buys 100 lightbulbs, each of which has an exponential lifetime of
+1000 hours. What is the expected time for the first of these bulbs to burn
+out?
+
+
+ANS: let x1,x2...xn be independent exponential random variable.
+
+$$ X _i = \mu. e^{-\mu x}  where x \geq 0 $$
+
+$$P(X>x) = e^{-\mu x} $$
+
+
+$$ so, E(X) = 1/\ { \sum \limits_{1}^{n} \mu i } $$
+
+X = first of these bulbs to burn out
+
+n=100
+
+$$\mu i=1/1000$$
+
+i =1,2,...100
+
+So, E(X) = 10 HRS.
+
+
+
+
+
+###Problem14.
+
+Assume that X1 and X2 are independent random variables, each having an
+exponential density with parameter $\lambda$. Show that Z = X1 - X2 has density
+
+$$ f_z(Z) = (1/2) \lambda e- ^ {\lambda{|z|} } $$
+
+
+ANS:  The density function of $X_1$ is $\lambda e^{-\lambda x}$ $(for\ x\geq 0)$ , and 0 elsewhere. There is a similar expression for the density function of $X_2$. By independence, the joint density function of $X_1\ and\ X_2$ is  $\lambda^2 e^{-\lambda x}e^{-\lambda y}$ in the first quadrant, and 0 elsewhere.
+
+Let $Z=X_1-X_2$. We want to find the density function of Z. First we will find the cumulative distribution function $F_Z(z)$ of Z, that is, the probability that $Z\leq z$.
+
+So we want the probability that $X_1-X_2\leq z$.
+
+Consider z fixed and positive, and draw the line $x_1-x_2=z$. We want to find the probability that the ordered pair (X_1,X_2) ends up below that line or on it. The only relevant region is in the first quadrant. So let D be the part of the first quadrant that lies below or on the line $x_1=x_2+z$. Then
+
+We will evaluate this integral, by using an iterated integral. First we will integrate with respect to y, and then with respect to x. Note that yy travels from $0 to x_2+z$, and then x travels from 0 to infinity. Thus 
+
+P(Z<=X) = $$\int_{0}^{\infty} - \lambda x (\int_{y=0}^{x+2} \lambda   e^{-\lambda y} )  dx$$
+
+
+P(Z<=X) = $$\int_{0}^{\infty} ( \lambda e^{-\lambda x}  - \lambda e^{-\lambda z} e^{-2\lambda x} ) dx$$
+
+
+P(Z<=X) = $$1 - \lambda/2 e^{-\lambda z} $$
+
+
+For the density function f_Z(z), we get
+
+
+$$F_Z(z) = \lambda/2 e^{-\lambda z} for z>=0 $$
+
+
+
+###Problem 1 8.2 CONTINUOUS RANDOM VARIABLES
+
+
+Let X be a continuous random variable with mean $\mu = 10$ and variance $\sigma ^2  = 100/3$. Using Chebyshev's Inequality, find an upper bound for the
+following probabilities.
+
+(a) P(|X - 10| >= 2).
+(b) P(|X - 10| >= 5).
+(c) P(|X - 10| >= 9).
+(d) P(|X - 10| >= 20).
+
+Chebychev inequality:
+
+Let X (integrable) be a random variable with finite expected value ?? and finite non-zero variance ??2. Then for any real number k > 0,
+
+
+$$P(|X-\mu|) \geq k\sigma) \leq 1/k^2 $$
+
+$\mu =2$ ,$\sigma ^2  = 100/3$
+
+
+(a) P(|X - 10|>=2).
+
+Let us find k first
+
+
+```{r P1.a, include=TRUE}
+
+s = 10/sqrt(3)
+#sigma
+s
+#value of k
+k = 2/s
+k
+#value of k square -- upper bound
+ksq = 1/(k*k)
+ksq
+```
+
+S0, P(|X - 10|>=2) <= 8.33 which is not true.
+
+
+(b) P(|X - 10| >= 5).
+
+```{r P1.b, include=TRUE}
+
+s = 10/sqrt(3)
+#sigma
+s
+#value of k
+k = 5/s
+k
+#value of k square  -- upper bound
+ksq = 1/(k*k)
+ksq
+```
+
+
+So, P(|X - 10|>=5) <= 1.33 which is not true
+
+
+(c) P(|X - 10| >= 9).
+
+```{r P1.c, include=TRUE}
+
+s = 10/sqrt(3)
+#sigma
+s
+#value of k
+k = 9/s
+k
+#value of k square  -- upper bound
+ksq = 1/(k*k)
+ksq
+```
+
+
+
+So, P(|X - 10|>=9) <= 0.4115 which is not true
+
+
+(d) P(|X - 10| >= 20).
+
+
+```{r P1.d, include=TRUE}
+
+s = 10/sqrt(3)
+#sigma
+s
+#value of k
+k = 20/s
+k
+#value of k square  -- upper bound
+ksq = 1/(k*k)
+ksq
+```
+
+
+So, P(|X - 10|>=20) <= 0.083 which is not true.
