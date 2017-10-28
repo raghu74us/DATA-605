@@ -1,0 +1,111 @@
+---
+title: "Data 605 Assignment9"
+author: "Raghu"
+date: "October 27, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Problem11 page 363 
+
+The price of one share of stock in the Pilsdorff Beer Company (see Exercise
+8.2.12) is given by Yn on the nth day of the year. Finn observes that
+the differences Xn = Yn+1 - Yn appear to be independent random variables
+with a common distribution having mean $\mu$ = 0 and variance $\sigma^2$ = 1/4. If
+Y1 = 100, estimate the probability that Y365 is
+(a) $\geq$ 100.
+
+ANS:
+
+$Y_{365} - Y_1 = X_1 + X_2 .. X_{364}$
+
+E[X] = $\mu$ = 0
+
+
+$P(Y_{365} - Y_1  \geq 0)$
+
+
+```{r P1.a, include=TRUE}
+a <- 0/sqrt(364)
+sigma <- sqrt(1/4)
+1 - pnorm(q = a, mean = 0, sd = sigma, lower.tail = TRUE)
+
+```
+
+(b) $\geq$ 110.
+
+$P(Y_{365} - Y_1  \geq 10)$
+
+```{r P1.b, include=TRUE}
+a <- 10/sqrt(364)
+sigma <- sqrt(1/4)
+1 - pnorm(q = a, mean = 0, sd = sigma, lower.tail = TRUE)
+
+```
+
+(c) $\geq$ 120.
+
+$P(Y_{365} - Y_1  \geq 20)$
+
+```{r P1.c, include=TRUE}
+a <- 20/sqrt(364)
+sigma <- sqrt(1/4)
+1 - pnorm(q = a, mean = 0, sd = sigma, lower.tail = TRUE)
+
+```
+
+
+
+2. Calculate the expected value and variance of the binomial distribution using the moment generating function.
+
+MGF 
+
+$$M(t) = [(1 - p) + pe^t]^n $$
+firs derivative
+
+$$ M'(t) = n(pe^t)[(1 - p) + pe^t]^{n - 1} $$
+
+
+mean =E(X) = $$\sum x.p(x) = np $$
+
+
+
+Variance 
+
+$$M''(t) = n(n - 1)(pe^t)^2[(1 - p) + pe^t]^{n - 2} + n(pe^t)[(1 - p) + pe^t]^{n - 1}$$
+
+$$ E(X^2) - [E(X)]^2 $$
+
+
+```{r P2, include=TRUE}
+#Lets take the values of last set from exercise above.
+n=120
+p=0.018
+
+m =n*p
+m
+
+v= (n^2 * p ) - m^2
+v
+
+```
+
+
+
+3. Calculate the expected value and variance of the exponential distribution using the moment generating function.
+
+$$f_X(x) = \lambda e^ {-\lambda x} I_{(0,\infty}) (x)$$
+
+$$ Mx(t) = \lambda / ( \lambda - t) $$
+$$E(X) = 1 / \lambda$$
+
+$$E(X^2) = 2/ \lambda ^2 $$
+
+$$E(X) - [E(X)]^2 = 1/\lambda ^2 $$
+
