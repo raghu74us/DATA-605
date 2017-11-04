@@ -1,0 +1,71 @@
+---
+title: "Data 605 Assignment10"
+author: "Raghu"
+date: "November 2, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+###Problem1
+Smith is in jail and has 1 dollar; he can get out on bail if he has 8 dollars.
+A guard agrees to make a series of bets with him. If Smith bets A dollars,
+he wins A dollars with probability .4 and loses A dollars with probability .6.
+Find the probability that he wins 8 dollars before losing all of his money if
+
+(a) he bets 1 dollar each time (timid strategy).
+
+The Markov chain (Xn, n = 0, 1, . . .) representing the evolution of
+Smith's money
+
+Let $\varphi(i)$ be the probability that the chain reaches state 8 before reaching state 0, starting from state i. In other words, if $S_j$ is the first $n \geq 0$ such that 
+$X_n = j$,
+
+
+$$\varphi(i) = P_i(S_8 < S_0) = P(S_8 < S_0|X_0 = i)$$
+
+Using first-step analysis (viz. the Markov property at time n = 1), we have
+
+$$\varphi(i) = 0.4\varphi(i + 1) + 0.6\varphi(i - 1),   i = 1, 2, 3, 4, 5, 6, 7$$
+
+$$\varphi(0) = 0$$
+
+$$\varphi(8) = 1$$
+```{r P1.a, include=TRUE}
+
+q <- 0.6
+p <- 0.4
+m <- 8
+qp = q/p
+for (s in 1:8) {
+P = (1 - qp^s)/(1-qp^m)
+print(paste0("s: " ,s," P:  ", P))
+#print(P)
+}
+
+```
+
+
+
+(b) he bets, each time, as much as possible but not more than necessary to
+bring his fortune up to 8 dollars (bold strategy).
+
+
+ANS: Since the prisoner bets A dollars and will lose or gain A dollars, and he bets his entire money each time until 8$. he must win each time or lose. If he  wins sequence is: 1,2,4,8. He starts with 1 dollar and must win 3 bets in a row at p=0.4 
+p=0.4
+
+```{r P1.b, include=TRUE}
+
+0.4^3
+
+```
+
+(c) Which strategy gives Smith the better chance of getting out of jail?
+
+
+Bold strategy gives Smith a better chance to get out of jail.
