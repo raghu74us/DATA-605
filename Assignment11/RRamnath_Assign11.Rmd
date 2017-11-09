@@ -1,0 +1,85 @@
+---
+title: "Data 605 Assignment11"
+author: "Raghu"
+date: "November 9, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Using the "cars" dataset in R, build a linear model for stopping distance as a function of speed and replicate the analysis of your textbook chapter 3 (visualization, quality evaluation of the model, and residual analysis.)
+
+```{r cars}
+
+summary(cars)
+
+lm_cars <- lm(cars$dist ~ cars$speed)
+
+summary(lm_cars)
+
+
+```
+
+##Visualization:
+
+```{r cars2}
+
+plot(cars$speed, cars$dist, xlab = "Speed (mph)", ylab = "Distance", col='blue')
+abline(lm_cars, col = "red")
+
+```
+
+
+##Residuals:
+
+```{r cars3}
+
+residual <- resid(lm_cars)
+
+summary(residual)
+
+hist(residual, xlab = "Residuals of Distance")
+
+```
+
+Residual is right skewed.
+
+
+```{r cars4}
+
+plot(fitted(lm_cars), resid(lm_cars),  col = 'blue')
+
+qqnorm(residual)
+qqline(residual)
+
+
+```
+
+
+##Using Log
+
+```{r cars5}
+
+
+lm2 <- lm(log(cars$dist) ~ log(cars$speed))
+summary(lm2)
+plot(log(cars$speed), log(cars$dist), xlab = 'log: Speed ', ylab = 'log: Distance', col = 'blue')
+abline(lm2, col = 'red')
+
+residual2 <- resid(lm2)
+
+summary(residual2)
+
+hist(residual2, xlab = "Residuals of Distance")
+
+qqnorm(residual2)
+qqline(residual2)
+
+```
+
+Using Log, Residuals appear to be normal and hetroskedacity is improved. 
