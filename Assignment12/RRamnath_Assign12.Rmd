@@ -1,0 +1,144 @@
+---
+title: "Data 605 Assignment12"
+author: "Raghu"
+date: "November 17, 2017"
+output:
+  html_document: default
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The attached who.csv dataset contains real-world data from 2008. The variables included follow.
+
+Country: name of the country
+LifeExp: average life expectancy for the country in years
+InfantSurvival: proportion of those surviving to one year or more
+Under5Survival: proportion of those surviving to five years or more
+TBFree: proportion of the population without TB.
+PropMD: proportion of the population who are MDs
+PropRN: proportion of the population who are RNs
+PersExp: mean personal expenditures on healthcare in US dollars at average exchange rate
+GovtExp: mean government expenditures per capita on healthcare, US dollars at average exchange rate
+TotExp: sum of personal and government expenditures.
+
+### 1. Provide a scatterplot of LifeExp~TotExp, and run simple linear regression. Do not transform the variables. Provide and interpret the F statistics, R^2, standard error,and p-values only. Discuss whether the assumptions of simple linear regression met.
+
+###Read csv file
+```{r rwd}
+
+library(knitr)
+url <- "C:/cuny/Fall_2017/DATA-605/Assignment12/who.csv"
+rwd  <- read.csv(file = url, header = T, stringsAsFactors = F)
+
+summary(rwd)
+
+
+kable(head(rwd))
+
+#scatter plot
+plot(rwd$LifeExp, rwd$TotExp, main="Scatterplot", 
+    xlab="Life Expectancy ", ylab="Total Expenidutres ", pch=19) 
+
+
+
+#simple linear regression
+lm_rwd <- lm(rwd$LifeExp ~ rwd$TotExp)
+abline(lm_rwd, col = "red")
+
+#residuals
+hist(resid(lm_rwd), main = "Histogram of Residuals", xlab = "residuals")
+
+#summary
+summary(lm_rwd)
+
+```
+
+
+
+### 2. Raise life expectancy to the 4.6 power (i.e., LifeExp^4.6). Raise total expenditures to the 0.06 power (nearly a log transform, TotExp^.06). Plot LifeExp^4.6 as a function of TotExp^.06, and r re-run the simple regression model using the transformed variables. Provide and interpret the F statistics, R^2, standard error, and p-values. Which model is "better?"
+
+
+
+```{r rwd2}
+
+#simple linear regression
+x <- rwd$LifeExp^4.6
+y <- rwd$TotExp^0.06
+lm_rwd2 <- lm(x ~ y)
+
+#scatter plot
+plot(x, y, main="Scatterplot 2", 
+    xlab="Life Expectancy ", ylab="Total Expenidutres ", pch=19) 
+
+abline(lm_rwd2, col = "red")
+
+#residuals
+hist(resid(lm_rwd2), main = "Histogram of Residuals", xlab = "residuals")
+
+#summary
+summary(lm_rwd2)
+
+plot(fitted(lm_rwd), resid(lm_rwd))
+plot(fitted(lm_rwd2), resid(lm_rwd2))
+
+```
+
+     Model2 is highly different and better compared to Model1. Adjusted Rsquare is 72% whereas Model1 is only 25%. 72% can be explained by model2. There seems to be a good correlation. p-value is less in Model2 compared to Model1. F-stat is 507 in model2 whereas only 65 in Model1. Residual standard error is high in Model2 and normally distributed in Model2. 
+
+### 3. Using the results from 3, forecast life expectancy when TotExp^.06 =1.5. 
+###  Then forecast life expectancy when TotExp^.06=2.5.
+
+$$y= -736527910  + 620060216 x$$
+
+
+$$life expectancy = y^(1/4.6)$$
+
+```{r rwd3}
+
+
+le <- function(fc)
+{   y <- -736527910 + 620060216 * (fc)
+    y <- y^(1/4.6)
+    print(y)
+}
+#Life expectancy when TotExp^.06 =1.5
+le(1.5)
+#Life expectancy when TotExp^.06 =2.5
+le(2.5)
+
+```
+
+
+
+### 4. Build the following multiple regression model and interpret the F Statistics, R^2, standard error, and p-values. How good is the model?
+### LifeExp = b0+b1 x PropMd + b2 x TotExp +b3 x PropMD x TotExp
+
+```{r rwd4}
+lm_fit3 <- lm(rwd$LifeExp ~ rwd$PropMD + rwd$TotExp + rwd$PropMD*rwd$TotExp)
+summary(lm_fit3)
+hist(resid(lm_fit3), main = "Histogram of Residuals", xlab = "residuals")
+plot(fitted(lm_fit3), resid(lm_fit3))
+
+```
+
+
+      
+      p-value is less than .05. model is statistically significant. F-statistic is 34.49 by adding 3 variables. Based on Rsquare only 35% of the variability can be explained by 3 variables. Correlation is moderate in this case. Residuals is right skewed. So, linear model is not valid.	  
+
+
+### 5. Forecast LifeExp when PropMD=.03 and TotExp = 14. Does this forecast seem realistic? Why or why not?
+
+
+$$LifeExp = 6.277 * 10^1 + 1.497*10^3 * PropMD + 7.233* 10^-5 TotExp-6.026*10^-3 *PropMD*TotExp$$
+
+
+```{r rwd5}
+LE <- ( (6.277*10^1) + (1.497*10^3)*.03 + (7.233*10^(-5))*14 - ((6.026*10^(-3))*0.03*14) ) 
+LE
+```
+
+    ###The forecast age 107.6 is an outlier and seems to be unrealistic. The expenditure is also low. 
