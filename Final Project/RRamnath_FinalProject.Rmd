@@ -1,0 +1,396 @@
+---
+title: "Data 605 Final Project"
+author: "Raghu"
+date: "December 9, 2017"
+output: 
+  html_document: 
+    code_folding: hide
+    css: custom.CSS
+    fig_caption: yes
+    fig_height: 7
+    fig_width: 10
+    highlight: textmate
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction: 
+
+  Below is the dataset of house prices available from Kaggle.com. The dataset has 1460 observations of houses in Ames, Iowa, and 81 variables potentially contributing to the house sale price.
+
+
+Link to the data set and description: 
+
+https://www.kaggle.com/c/house-prices-advanced-regression-techniques/data
+
+
+```{r a1}
+
+library(knitr)
+library(DT)
+library(MASS)
+library(reshape)
+library(ggplot2)
+
+traindf <- read.csv('https://raw.githubusercontent.com/raghu74us/DATA-605/master/Final%20Project/train.csv')
+  
+datatable(traindf, options = list( pageLength = 5, lengthMenu = c(5, 10, 40),   initComplete = JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#01975b', 'color': '#fff'});",
+    "}")), rownames=TRUE)
+
+```
+
+
+# Variables
+
+  Pick one of the quantitative independent variables from the training data set (train.csv) , and define that variable as  X.   Pick SalePrice as the dependent variable, and define it as Y for the next analysis.   
+  
+```{r v1}
+#chosen variable
+X<-traindf$OverallCond
+Y<-traindf$SalePrice
+
+plot(X,Y, col="#4caf50", main="Scatterplot of Overall Condition and Sale Price", xlab = "Overall Condition", ylab="Sale Price")
+abline(lm(Y~X), col="yellow", lwd=3) # regression line (y~x) 
+
+hist(X, col="green", main="Histogram of Overall Condition", xlab = "Overall Condition")
+
+hist(Y, col="#80cbc4", main="Histogram of Sale Price", xlab = "Sale Price")
+
+print("Summary of X variable: Overall Condition")
+summary(X)
+boxplot(X)
+print("Summary of X variable: Sale Price")
+summary(Y)
+boxplot(Y)
+
+```
+
+
+
+# Probability
+
+  Calculate as a minimum the below probabilities a through c.  Assume the small letter "x" is estimated as the 1st quartile of the X variable, and the small letter "y" is estimated as the 2nd quartile of the Y variable.  Interpret the meaning of all probabilities.  
+
+a.	$$ P(X>x | Y>y) $$		
+
+  
+```{r P1}
+
+XQ1<-quantile(X, probs=0.25)  #1st quartile of X variable
+XQ1
+YQ2<-quantile(Y, probs=0.50) #2nd quartile, or median, of Y variable
+YQ2
+n<-(nrow(traindf))
+n
+overallcond<-as.numeric(traindf$OverallCond)
+saleprice<-as.numeric(traindf$SalePrice)
+
+nYQ2<-nrow(subset(traindf,saleprice>YQ2))
+nYQ2
+p1<-nrow(subset(traindf, overallcond > XQ1 & saleprice>YQ2))/nYQ2
+p1
+
+```
+
+b.  $$ P(X>x, Y>y)	$$	
+
+```{r P2}
+
+p2<-nrow(subset(traindf, overallcond > XQ1 & saleprice>YQ2))/n
+p2
+
+```
+
+c.  $$ P(X<x | Y>y) $$		
+
+```{r P3}
+
+p3<-nrow(subset(traindf, overallcond < XQ1 & saleprice>YQ2))/nYQ2
+p3
+
+```
+
+
+# Independence
+
+   Does splitting the training data in this fashion make them independent? In other words, does P(X|Y)=P(X)P(Y))?   Check mathematically, and then evaluate by running a Chi Square test for association. You might have to research this.  
+
+
+```{r P4}
+
+c1<-nrow(subset(traindf, overallcond <=XQ1 & saleprice<=YQ2))/n
+c2<-nrow(subset(traindf, overallcond <=XQ1 & saleprice>YQ2))/n
+c4<-nrow(subset(traindf, overallcond >XQ1 & saleprice<=YQ2))/n
+c5<-nrow(subset(traindf, overallcond >XQ1 & saleprice>YQ2))/n
+
+dfcounts<-matrix(round(c(c1,c2,c4,c5),3), ncol=2, nrow=2, byrow=TRUE)
+colnames(dfcounts)<-c(
+"<=1 quartile",
+">1 quartile")
+rownames(dfcounts)<-c("<=2nd quartile",">2nd quartile")
+
+print("Quartile Matrix Percent")
+
+dfcounts<-as.table(dfcounts)
+addmargins(dfcounts)
+
+print (paste0("p(A)*p(B)=", round(c4*c5,5)))
+
+
+```
+
+
+
+$$ p(A|B)=p(X>x|Y>y)= 0.24313$$
+
+$$ p(A)*p(B)=0.03106 $$  
+$$ p(A|B) != p(A)*p(B)$$
+
+```{r P4.1}
+
+chisq.test(dfcounts, correct=TRUE) 
+
+```
+
+
+# Statistics
+
+   Descriptive and Inferential Statistics. Provide univariate descriptive statistics and appropriate plots for both variables.   Provide a scatterplot of X and Y.  Transform both variables simultaneously using Box-Cox transformations.  You might have to research this.
+
+
+```{r P5}
+
+summary(traindf)
+
+```
+
+
+## Confidence interval
+
+```{r P6}
+
+t.test(traindf$OverallCond, traindf$SalePrice)
+
+```
+
+# Linear Algebra and Correlation.   
+
+Using at least three untransformed variables, build a correlation matrix.  Invert your correlation matrix. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix.
+
+```{r P7}
+
+myvars<-data.frame(traindf$OverallCond, traindf$YearBuilt,traindf$SalePrice)
+head(myvars) 
+cor(myvars)
+
+cor.test(traindf$OverallCond + traindf$YearBuilt, traindf$SalePrice, conf.level = 0.99)
+
+t.test(traindf$OverallCond + traindf$YearBuilt, traindf$SalePrice, conf.level = 0.99)
+
+mymx<-as.matrix(cor(myvars))
+#correlation matrix
+mymx
+
+
+#inverse of correlation matrix, precision matrix
+ginvmymx<-ginv(mymx)
+ginvmymx
+
+
+#corr mat * precision mat
+mymxginv<-mymx%*%ginvmymx
+round(mymxginv,2)
+
+#precision mat x corr mat
+ginvmymx<-ginvmymx%*%mymx
+round(ginvmymx,2)
+
+
+```
+
+
+With a 99 percent confidence level, the correlation between Overall condition plus Year Built and Sale Price is estimated to be between 0.47 and 0.57.
+
+
+
+## Principal Components Analysis
+
+### correlation matrix for all quantitative variables
+
+```{r P8}
+
+#Correlation matrix of all quantitative variables in dataframe
+
+cormatrix<-cor(traindf[,sapply(traindf, is.numeric)])
+cordf<-as.data.frame(cormatrix)
+kable(head(cordf))
+
+
+```
+
+
+
+###correlation
+
+```{r P8.1}
+
+cordf[cordf == 1] <- NA #drop correlation of 1, diagonals
+cordf[abs(cordf) < 0.1] <- NA # drop correlations of less than 0.1
+cordf<-as.matrix(cordf)
+#cordf
+cordf2<- na.omit(melt(cordf)) 
+kable(head(cordf2[order(-abs(cordf2$value)),]))
+
+```
+
+### All variables with correlation to Sale Price
+```{r P8.2}
+#test of alternate corr approach
+#myvars<-data.frame(traindf$OverallCond, traindf$SalePrice)
+#head(myvars)
+
+topcors <- cordf2[ which(cordf2$X2=='SalePrice'),]
+
+topcorsdf<-topcors[order(-abs(topcors$value)),]# sort by highest correlations
+#topcorsdf
+
+cors1<-data.frame(topcorsdf$X1,topcorsdf$X2,topcorsdf$value)
+kable(cors1)
+
+par(mar=c(8,8,1,1))
+barplot(topcorsdf$value, ylab="Correlation to Sale Price", ylim=c(0,1), col=rainbow(20), las=2, names.arg=topcorsdf$X1)
+
+
+
+```
+
+
+# Sampling
+
+  Calculus-Based Probability & Statistics.  Many times, it makes sense to fit a closed form distribution to data.  For your non-transformed independent variable, location shift (if necessary)  it so that the minimum value is above zero.  Then load the MASS package and run fitdistr to fit a density function of your choice.  (See  https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ).  Find the optimal value of the parameters for this distribution, and then take 1000 samples from this distribution (e.g., rexp(1000, ???) for an exponential).  Plot a histogram and compare it with a histogram of your non-transformed original variable.   
+  
+Minimum value is above 0.
+
+```{r P9}
+
+#check that min val is not 0
+min(traindf$OverallCond)
+
+```  
+
+
+```{r P9.1}
+
+fit <- fitdistr(traindf$OverallCond, "exponential")
+lambda <- fit$estimate
+sampledf <- rexp(1000, lambda)
+lambda
+sampledf<-data.frame(as.numeric(sampledf))
+colnames(sampledf)[1] <- "sample"
+str(sampledf)
+head(sampledf)
+hist(sampledf$sample, col="green", main="Histogram of Exponential Distribution", xlab = "Overall Condition", breaks=30)
+```
+
+
+
+# Modeling  
+
+  Build some type of regression model and submit your model to the competition board.  Provide your complete model summary and results with analysis.  Report your Kaggle.com  user name and score.
+
+## Multiple Linear Regression
+
+```{r P10}
+
+fit <- lm(traindf$SalePrice ~ traindf$OverallQual + traindf$GrLivArea + traindf$GarageCars + traindf$GarageArea, data=traindf)
+summary(fit)
+
+```
+
+
+
+
+$$ SalePrice=26988.854*OverallQual + 49.573*GrLivArea + 11317.522*GarageCars + 41.478*GarageArea - 98436.050 $$
+
+```{r P11}
+
+par(mfrow=c(2,2))
+X1<-traindf$OverallQual
+X2<-traindf$GrLivArea
+X3<-traindf$GarageCars
+X4<-traindf$GarageArea
+Y<-traindf$SalePrice
+
+plot(X1,Y, col="#f06293", main="OverallQual", ylab="Sale Price")
+abline(lm(Y~X1), col="green", lwd=3) # regression line (y~x)
+
+plot(X2,Y, col="#9c27b1", main="GrLivArea", ylab="Sale Price")
+abline(lm(Y~X2), col="green", lwd=3) # regression line (y~x)
+
+plot(X3,Y, col="#ce93d7", main="GarageCars", ylab="Sale Price")
+abline(lm(Y~X3), col="green", lwd=3) # regression line (y~x)
+
+plot(X4,Y, col="#c2185c", main="GarageArea", ylab="Sale Price")
+abline(lm(Y~X4), col="green", lwd=3) # regression line (y~x)
+
+```
+
+
+  Load test data set and create calculated column using equation for multiple linear regression. Select required columns and export to csv for contest entry.
+
+```{r P12}
+dftest <- read.csv('https://raw.githubusercontent.com/raghu74us/DATA-605/master/Final%20Project/test.csv')
+
+SalePrice<-((26988.854*dftest$OverallQual) + (49.573*dftest$GrLivArea) +  (11317.522*dftest$GarageCars) + (41.478*dftest$GarageArea) -98436.050)
+
+
+dftest<-dftest[,c("Id","OverallQual","GrLivArea","GarageCars","GarageArea")]
+
+kable(head(dftest))
+
+submission <- cbind(dftest$Id,SalePrice)
+colnames(submission)[1] <- "Id"
+submission[submission<0] <- median(SalePrice)
+submission<-as.data.frame(submission[1:1459,])
+submission[is.na(submission)] <- 0
+head(submission)
+
+```
+
+
+### Upload csv to Kaggle.
+
+```{r P13}
+
+kable(head(submission))
+
+write.csv(submission, file = 'C:/cuny/Fall_2017/DATA-605/Final Project/submission1.csv', quote=FALSE, row.names=FALSE)
+
+#write.csv(submission, file = 'C:/submission1.csv', quote=FALSE, row.names=FALSE)
+
+```
+
+
+```{r P14}
+
+#knitr::include_graphics('C:/cuny/Fall_2017/DATA-605/Final Project/score.PNG')
+knitr::include_graphics('https://raw.githubusercontent.com/raghu74us/DATA-605/master/Final%20Project/score.PNG')
+
+```
+
+
+
+# Analysis:   
+
+    Based on the correlation of attributes and sale price, I chose the top four attributes with high correlation. I also used only the linear regression modal to predict the score. With this modal and parameter, I got a kaggle score of 0.78.  Residuals is high based on the linear modal regression. For these 4 attributes, scatter plot shows its linear and normally distributed. Inititally i did a comparison of "overall condition" and Saleprice but the "Overall Condition" did not show up in the correlation. The probability test proves P(A???B) <> P(A)P(B) that the variables are dependent.  The correlation test of OverallCond + Yearbuilt vs Saleprice gave a confidence interval of 0.47 and 0.57. 
+    Inorder to improve the score, I would have to try with different regression modals and also the top 10 attributes with high correlation. 
+    
+    
