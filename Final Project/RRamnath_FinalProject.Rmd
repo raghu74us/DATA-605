@@ -100,7 +100,7 @@ p1
 
 ```
 
-b.  $$ P(X>x, Y>y)	$$	
+b.  $$ P(X>x \& Y>y)	$$	
 
 ```{r P2}
 
@@ -121,7 +121,7 @@ p3
 
 # Independence
 
-   Does splitting the training data in this fashion make them independent? In other words, does P(X|Y)=P(X)P(Y))?   Check mathematically, and then evaluate by running a Chi Square test for association. You might have to research this.  
+   Does splitting the training data in this fashion make them independent? In other words, does P(XY)=P(X)P(Y))?   Check mathematically, and then evaluate by running a Chi Square test for association. You might have to research this.  
 
 
 ```{r P4}
@@ -149,10 +149,10 @@ print (paste0("p(A)*p(B)=", round(c4*c5,5)))
 
 
 
-$$ p(A|B)=p(X>x|Y>y)= 0.24313$$
+$$ p(AB)=p(X>x \& Y>y)= 0.24313$$
 
 $$ p(A)*p(B)=0.03106 $$  
-$$ p(A|B) != p(A)*p(B)$$
+$$ p(AB) != p(A)*p(B)$$
 
 ```{r P4.1}
 
